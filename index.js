@@ -19,11 +19,11 @@ const GAME_DURATION = 5 * 60 * 1000; // 5 minutes in milliseconds
 io.on('connection', (socket) => {
   console.log('New player connected:', socket.id);
 
-  // Create a new player with initial triangle
+  // Create a new player with initial triangle in center of screen
   const initialTriangle = {
     id: Date.now() + Math.random(),
-    x: Math.random() * 800 + 100, // Random position away from edges
-    y: Math.random() * 400 + 100,
+    x: 500, // Center X
+    y: 300, // Center Y
     sides: 3,
     size: 20,
     color: getRandomColor(),
