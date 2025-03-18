@@ -373,9 +373,16 @@ setInterval(() => {
       const player = game.players[playerId];
       if (player.polygons) {
         player.polygons.forEach(polygon => {
-          if (!polygon.isProducer && polygon.lastSpawnTime + polygon.spawnInterval <= now) {
-            spawnFighter(game, polygon);
-            polygon.lastSpawnTime = now;
+          if (!polygon.isProducer) {
+            if (!polygon.lastSpawnTime) {
+              polygon.lastSpawnTime = now;
+              polygon.spawnInterval = 5000; // 5 seconds between spawns
+            }
+            
+            if (now - polygon.lastSpawnTime >= polygon.spawnInterval) {
+              spawnFighter(game, polygon);
+              polygon.lastSpawnTime = now;
+            }
           }
         });
       }
@@ -425,6 +432,8 @@ setInterval(() => {
 }, 100);
 
 function spawnFighter(game, polygon) {
+  if (polygon.isProducer) return; // Don't spawn fighters from producers
+  
   const fighter = {
     id: Date.now() + Math.random(),
     x: polygon.x,
@@ -434,15 +443,22 @@ function spawnFighter(game, polygon) {
     color: polygon.color,
     ownerId: polygon.ownerId,
     rotation: 0,
-    targetX: null,
-    targetY: null
+    targetX: Math.random() * 1000, // Random target position
+    targetY: Math.random() * 600,
+    spawnTime: Date.now()
   };
 
-  polygon.fighters.push(fighter); // Add fighter to parent polygon
-  game.enemies.push(fighter); // Add fighter to game enemies
+  if (!polygon.fighters) {
+    polygon.fighters = [];
+  }
+  polygon.fighters.push(fighter);
+  game.enemies.push(fighter);
 
-  //Send fighter spawned event
-  io.to(game.id).emit('fighterSpawned', {fighter, polygonId: polygon.id});
+  // Send fighter spawned event
+  io.to(game.id).emit('fighterSpawned', {
+    fighter: fighter,
+    polygonId: polygon.id
+  });
 }
 
 
