@@ -333,12 +333,12 @@ setInterval(() => {
       spawnEnemy(game);
     }
 
-        // Spawn fighters for each polygon
+        // Spawn fighters for combat polygons
     for (const playerId in game.players) {
       const player = game.players[playerId];
       if (player.polygons) {
         player.polygons.forEach(polygon => {
-          if (polygon.lastSpawnTime + polygon.spawnInterval <= now) {
+          if (!polygon.isProducer && polygon.lastSpawnTime + polygon.spawnInterval <= now) {
             spawnFighter(game, polygon);
             polygon.lastSpawnTime = now;
           }
