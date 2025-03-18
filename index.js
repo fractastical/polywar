@@ -46,10 +46,7 @@ io.on('connection', (socket) => {
     socket.emit('gameState', games[gameId]);
     
     // Inform other players about the new player
-    socket.to(gameId).emit('playerJoined', {
-      id: socket.id,
-      color: players[socket.id].color
-    });
+    socket.to(gameId).emit('playerJoined', players[socket.id]);
   });
   
   // Handle player actions
@@ -174,6 +171,110 @@ function getRandomColor() {
 
 function findPolygon(polygons, id) {
   return polygons.find(p => p.id === id);
+}
+
+// Add the missing functions
+function updateEnemies(game, deltaTime) {
+  // Move enemies toward their targets
+  for (const enemy of game.enemies) {
+    if (enemy.targetX !== null && enemy.targetY !== null) {
+      const dx = enemy.targetX - enemy.x;
+      const dy = enemy.targetY - enemy.y;
+      const distance = Math.sqrt(dx * dx + dy * dy);
+      
+      if (distance > 5) {
+        // Enemy speed based on sides (fewer sides = faster)
+        const speed = 0.5 + (3 - Math.min(enemy.sides, 9)) * 0.1;
+        enemy.x += (dx / distance) * speed;
+        enemy.y += (dy / distance) * speed;
+      } else {
+        // Pick a new random target
+        enemy.targetX = Math.random() * 1000;
+        enemy.targetY = Math.random() * 600;
+      }
+    }
+    
+    // Rotate the enemy
+    enemy.rotation = (enemy.rotation || 0) + 0.01;
+  }
+}
+
+function checkCollisions(game) {
+  // For each player's polygons
+  for (const playerId in game.players) {
+    const player = game.players[playerId];
+    
+    // Skip if player has no polygons
+    if (!player.polygons) continue;
+    
+    // Check each polygon
+    for (let i = player.polygons.length - 1; i >= 0; i--) {
+      const polygon = player.polygons[i];
+      
+      // Check against enemies
+      for (let j = game.enemies.length - 1; j >= 0; j--) {
+        const enemy = game.enemies[j];
+        
+        const dx = polygon.x - enemy.x;
+        const dy = polygon.y - enemy.y;
+        const distance = Math.sqrt(dx * dx + dy * dy);
+        
+        if (distance < polygon.size + enemy.size) {
+          // Player polygon wins if it has exactly one more side
+          if (polygon.sides === enemy.sides + 1) {
+            game.enemies.splice(j, 1);
+            player.resources += Math.floor(enemy.sides * 5);
+            
+            // Send enemy removed event
+            io.to(game.id).emit('enemyRemoved', {
+              enemyId: enemy.id,
+              playerId: playerId
+            });
+            
+            break;
+          }
+          // Enemy wins if it has exactly one more side
+          else if (enemy.sides === polygon.sides + 1) {
+            player.polygons.splice(i, 1);
+            
+            // Send polygon removed event
+            io.to(game.id).emit('polygonRemoved', {
+              polygonId: polygon.id,
+              playerId: playerId
+            });
+            
+            break;
+          }
+        }
+      }
+    }
+  }
+}
+
+function spawnEnemy(game) {
+  const sides = Math.floor(Math.random() * 7) + 3; // 3 to 9 sides
+  
+  // Size and speed based on sides
+  const size = 15 + (sides - 3) * 5;
+  const speed = 2.0 - (sides - 3) * 0.2;
+  
+  const enemy = {
+    id: Date.now() + Math.random(),
+    x: 1000 + Math.random() * 100, // Spawn off screen to the right
+    y: Math.random() * 600,
+    sides: sides,
+    size: size,
+    color: 'red',
+    rotation: 0,
+    targetX: Math.random() * 800,
+    targetY: Math.random() * 600,
+    speed: speed
+  };
+  
+  game.enemies.push(enemy);
+  
+  // Inform all players about the new enemy
+  io.to(game.id).emit('enemySpawned', enemy);
 }
 
 // Game loop
