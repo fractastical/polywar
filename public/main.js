@@ -240,8 +240,10 @@ canvas.addEventListener('click', (e) => {
             let canPlace = false;
             const placementRadius = 150; // Maximum distance from existing polygons
             
-            // First check if we're within radius of any of our polygons
-            if (players[playerId] && players[playerId].polygons) {
+            // Allow first polygon anywhere, subsequent ones need to be within radius
+            if (!players[playerId] || !players[playerId].polygons || players[playerId].polygons.length === 0) {
+                canPlace = true;
+            } else {
                 for (const ownedPolygon of players[playerId].polygons) {
                     const distance = Math.sqrt(
                         Math.pow(ownedPolygon.x - e.clientX, 2) + 
