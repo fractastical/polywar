@@ -242,30 +242,51 @@ function checkCollisions(game) {
         const distance = Math.sqrt(dx * dx + dy * dy);
 
         if (distance < polygon.size + enemy.size) {
-          // Player polygon wins if it has exactly one more side
+          // Combat rules
           if (polygon.sides === enemy.sides + 1) {
+            // Player polygon wins if it has exactly one more side
             game.enemies.splice(j, 1);
             player.resources += Math.floor(enemy.sides * 5);
 
-            // Send enemy removed event
             io.to(game.id).emit('enemyRemoved', {
               enemyId: enemy.id,
               playerId: playerId
             });
-
             break;
-          }
-          // Enemy wins if it has exactly one more side
+          } 
           else if (enemy.sides === polygon.sides + 1) {
+            // Enemy wins if it has exactly one more side
             player.polygons.splice(i, 1);
-
-            // Send polygon removed event
+            
             io.to(game.id).emit('polygonRemoved', {
               polygonId: polygon.id,
               playerId: playerId
             });
-
             break;
+          }
+          else {
+            // Bounce off each other
+            const angle = Math.atan2(dy, dx);
+            const overlap = (polygon.size + enemy.size) - distance;
+            
+            // Move polygons apart
+            polygon.x += Math.cos(angle) * overlap/2;
+            polygon.y += Math.sin(angle) * overlap/2;
+            enemy.x -= Math.cos(angle) * overlap/2;
+            enemy.y -= Math.sin(angle) * overlap/2;
+            
+            // Bounce velocities if they have momentum
+            if (polygon.targetX !== null) {
+              const tempX = polygon.targetX;
+              const tempY = polygon.targetY;
+              polygon.targetX = polygon.x - (polygon.targetX - polygon.x);
+              polygon.targetY = polygon.y - (polygon.targetY - polygon.y);
+            }
+            
+            if (enemy.targetX !== null) {
+              enemy.targetX = enemy.x - (enemy.targetX - enemy.x);
+              enemy.targetY = enemy.y - (enemy.targetY - enemy.y);
+            }
           }
         }
       }
