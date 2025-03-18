@@ -88,9 +88,9 @@ io.on('connection', (socket) => {
         rotation: 0,
         targetX: null,
         targetY: null,
-        isProducer: data.isProducer,
+        isProducer: Boolean(data.isProducer), // Ensure boolean value
         lastSpawnTime: Date.now(),
-        spawnInterval: 5000, // Spawn every 5 seconds
+        spawnInterval: 3000, // Spawn every 3 seconds
         fighters: [] // Store spawned fighters
       };
 
@@ -373,13 +373,16 @@ setInterval(() => {
       const player = game.players[playerId];
       if (player.polygons) {
         player.polygons.forEach(polygon => {
-          if (!polygon.isProducer) {
+          // Make sure polygon has isProducer property defined
+          if (polygon.isProducer === false) {
             if (!polygon.lastSpawnTime) {
               polygon.lastSpawnTime = now;
-              polygon.spawnInterval = 5000; // 5 seconds between spawns
+              polygon.spawnInterval = 3000; // 3 seconds between spawns
+              polygon.fighters = [];
             }
             
             if (now - polygon.lastSpawnTime >= polygon.spawnInterval) {
+              console.log("Spawning fighter from combat polygon:", polygon.id);
               spawnFighter(game, polygon);
               polygon.lastSpawnTime = now;
             }
