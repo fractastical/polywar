@@ -20,14 +20,16 @@ canvas.height = window.innerHeight;
 
 // Polygon information
 const polygonInfo = {
-    3: { name: "Triangle", cost: 10, size: 20, color: "#FF5733", speed: 2.0 },
-    4: { name: "Square", cost: 15, size: 25, color: "#33FF57", speed: 1.8 },
-    5: { name: "Pentagon", cost: 20, size: 30, color: "#3357FF", speed: 1.6 },
-    6: { name: "Hexagon", cost: 25, size: 35, color: "#F033FF", speed: 1.4 },
-    7: { name: "Heptagon", cost: 30, size: 40, color: "#FF33A1", speed: 1.2 },
-    8: { name: "Octagon", cost: 35, size: 45, color: "#33FFF6", speed: 1.0 },
-    9: { name: "Nonagon", cost: 40, size: 50, color: "#BFFF33", speed: 0.8 }
+    3: { name: "Triangle", cost: 10, size: 20, color: "#FF5733", speed: 2.0, combatDamage: 15 },
+    4: { name: "Square", cost: 15, size: 25, color: "#33FF57", speed: 1.8, combatDamage: 20 },
+    5: { name: "Pentagon", cost: 20, size: 30, color: "#3357FF", speed: 1.6, combatDamage: 25 },
+    6: { name: "Hexagon", cost: 25, size: 35, color: "#F033FF", speed: 1.4, combatDamage: 30 },
+    7: { name: "Heptagon", cost: 30, size: 40, color: "#FF33A1", speed: 1.2, combatDamage: 35 },
+    8: { name: "Octagon", cost: 35, size: 45, color: "#33FFF6", speed: 1.0, combatDamage: 40 },
+    9: { name: "Nonagon", cost: 40, size: 50, color: "#BFFF33", speed: 0.8, combatDamage: 45 }
 };
+
+let isProducerMode = true; // Toggle between producer and combat mode
 
 // Socket.io event handlers
 socket.on('connect', () => {
@@ -166,6 +168,12 @@ canvas.addEventListener('mousemove', (e) => {
 
 // Keyboard handling
 window.addEventListener('keydown', (e) => {
+    // T key toggles between producer and combat mode
+    if (e.key === 't' || e.key === 'T') {
+        isProducerMode = !isProducerMode;
+        updateModeDisplay();
+    }
+    
     // Number keys 3-9 select polygon type
     const keyNum = parseInt(e.key);
     if (!isNaN(keyNum) && keyNum >= 3 && keyNum <= 9) {
@@ -311,8 +319,9 @@ function updateModeDisplay() {
         document.getElementById('currentMode').textContent = "None";
     } else {
         const info = polygonInfo[currentMode];
+        const type = isProducerMode ? "Producer" : "Combat";
         document.getElementById('currentMode').textContent = 
-            `${info.name} (Cost: ${info.cost})`;
+            `${info.name} - ${type} (Cost: ${info.cost})`;
     }
 }
 
