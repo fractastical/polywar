@@ -567,23 +567,18 @@ function render() {
         }
     }
 
-    // Draw fighters for all polygons
-    for (const pid in players) {
-        const player = players[pid];
-        if (player && player.polygons) {
-            for (const polygon of player.polygons) {
-                if (polygon.fighters) {
-                    for (const fighter of polygon.fighters) {
-                        drawPolygon(fighter, false, pid === playerId, false);
-                    }
-                }
-            }
-        }
-    }
-
-    // Draw enemy polygons
+    // Draw enemy polygons and fighters
     for (const enemy of enemies) {
-        drawPolygon(enemy, false, false, true);
+        // If it's a fighter (has a parentId), draw it with the parent's color
+        if (enemy.parentId) {
+            const parent = findPolygonInGame(enemy.parentId);
+            if (parent) {
+                drawPolygon(enemy, false, parent.ownerId === playerId, false);
+            }
+        } else {
+            // Regular enemy
+            drawPolygon(enemy, false, false, true);
+        }
     }
 }
 
