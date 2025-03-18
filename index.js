@@ -433,31 +433,32 @@ setInterval(() => {
 
 function spawnFighter(game, polygon) {
   if (polygon.isProducer) return; // Don't spawn fighters from producers
-  
+
+  // Create the fighter with combat properties
   const fighter = {
     id: Date.now() + Math.random(),
     x: polygon.x,
     y: polygon.y,
     sides: polygon.sides,
-    size: polygon.size / 2,
+    size: polygon.size * 0.75,
     color: polygon.color,
     ownerId: polygon.ownerId,
     rotation: 0,
-    targetX: Math.random() * 1000, // Random target position
-    targetY: Math.random() * 600,
-    spawnTime: Date.now()
+    targetX: polygon.x + (Math.random() * 200 - 100), // Random position around parent
+    targetY: polygon.y + (Math.random() * 200 - 100),
+    spawnTime: Date.now(),
+    parentId: polygon.id,
+    isProducer: false
   };
 
-  if (!polygon.fighters) {
-    polygon.fighters = [];
-  }
-  polygon.fighters.push(fighter);
+  // Add to game state
   game.enemies.push(fighter);
 
-  // Send fighter spawned event
+  // Broadcast spawn event to all players
   io.to(game.id).emit('fighterSpawned', {
     fighter: fighter,
-    polygonId: polygon.id
+    polygonId: polygon.id,
+    ownerId: polygon.ownerId
   });
 }
 
