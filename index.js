@@ -398,31 +398,10 @@ setInterval(() => {
             }
             
             // Check if enough time has passed to spawn
-            if (now - polygon.lastSpawnTime >= polygon.spawnInterval) {
-              const fighter = {
-                id: Date.now() + Math.random(),
-                x: polygon.x + (Math.random() * 40 - 20),
-                y: polygon.y + (Math.random() * 40 - 20),
-                sides: polygon.sides,
-                size: polygon.size * 0.75,
-                color: polygon.color,
-                ownerId: polygon.ownerId,
-                rotation: 0,
-                targetX: polygon.x + (Math.random() * 200 - 100),
-                targetY: polygon.y + (Math.random() * 200 - 100),
-                parentId: polygon.id
-              };
-
-              // Add to game enemies and update spawn time
-              game.enemies.push(fighter);
+            const timeSinceLastSpawn = now - polygon.lastSpawnTime;
+            if (timeSinceLastSpawn >= polygon.spawnInterval) {
+              spawnFighter(game, polygon);
               polygon.lastSpawnTime = now;
-
-              // Emit the spawn event
-              io.to(game.id).emit('fighterSpawned', {
-                fighter: fighter,
-                polygonId: polygon.id,
-                ownerId: polygon.ownerId
-              });
             }
           }
         });
