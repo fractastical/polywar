@@ -223,9 +223,11 @@ window.addEventListener('keydown', (e) => {
 
     // F key spawns a fighter from selected combat polygon
     if (e.key === 'f' || e.key === 'F') {
-        if (selectedPolygon && !selectedPolygon.isProducer) {
+        if (selectedPolygon && selectedPolygon.isProducer === false) {
+            console.log("Attempting to spawn fighter from polygon:", selectedPolygon.id);
             socket.emit('spawnFighter', {
-                polygonId: selectedPolygon.id
+                polygonId: selectedPolygon.id,
+                gameId: gameId
             });
         }
     }

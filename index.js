@@ -160,15 +160,27 @@ io.on('connection', (socket) => {
 
   // Handle disconnection
   socket.on('spawnFighter', (data) => {
+    console.log("Spawn fighter request received:", data);
     const game = games[socket.gameId];
-    if (!game) return;
+    if (!game) {
+      console.log("Game not found");
+      return;
+    }
     
     const player = game.players[socket.id];
-    if (!player || !player.polygons) return;
+    if (!player || !player.polygons) {
+      console.log("Player or polygons not found");
+      return;
+    }
 
     const polygon = player.polygons.find(p => p.id === data.polygonId);
-    if (polygon && !polygon.isProducer) {
-      spawnFighter(game, polygon);
+    if (polygon) {
+      console.log("Found polygon, isProducer:", polygon.isProducer);
+      if (polygon.isProducer === false) {
+        spawnFighter(game, polygon);
+      }
+    } else {
+      console.log("Polygon not found:", data.polygonId);
     }
   });
 
