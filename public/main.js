@@ -208,6 +208,7 @@ canvas.addEventListener('click', (e) => {
         const cost = polygonInfo[currentMode].cost;
         if (resources >= cost) {
             const info = polygonInfo[currentMode];
+            const placementMode = isProducerMode; // Determine placement mode
 
             // Check if the placement location overlaps with existing polygons
             let canPlace = true;
@@ -250,7 +251,8 @@ canvas.addEventListener('click', (e) => {
                     y: e.clientY,
                     sides: currentMode,
                     size: info.size,
-                    cost: cost
+                    cost: cost,
+                    isProducer: placementMode // Added isProducer flag
                 });
             }
         }
@@ -386,7 +388,7 @@ function drawPolygon(polygon, isSelected, isOwned = true, isEnemy = false) {
     if (isEnemy) {
         ctx.strokeStyle = "#800000";
     } else if (isOwned) {
-        ctx.strokeStyle = isProducerMode ? "#00FFFF" : "#FFD700"; // Cyan for producer, Gold for combat
+        ctx.strokeStyle = polygon.isProducer ? "#00FFFF" : "#FFD700"; // Cyan for producer, Gold for combat - needs server-side update
     } else {
         ctx.strokeStyle = "#AAAAAA";
     }

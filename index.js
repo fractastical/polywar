@@ -69,7 +69,8 @@ io.on('connection', (socket) => {
         ownerId: socket.id,
         rotation: 0,
         targetX: null,
-        targetY: null
+        targetY: null,
+        isProducer: data.isProducer
       };
       
       // Add the polygon to the player's collection
@@ -292,10 +293,17 @@ setInterval(() => {
     // Check for collisions
     checkCollisions(game);
     
-    // Generate resources
+    // Generate resources based on producers
     if (Math.random() < 0.1) {
       for (const playerId in game.players) {
-        game.players[playerId].resources++;
+        const player = game.players[playerId];
+        if (player.polygons) {
+          const producers = player.polygons.filter(p => p.isProducer);
+          const resourceGain = producers.reduce((sum, p) => sum + (p.size / 20), 0);
+          if (resourceGain > 0) {
+            player.resources += resourceGain;
+          }
+        }
       }
       // Broadcast resource update
       io.to(gameId).emit('resourceUpdate', { 
