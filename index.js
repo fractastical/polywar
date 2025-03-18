@@ -326,7 +326,7 @@ setInterval(() => {
         const player = game.players[playerId];
         if (player.polygons) {
           const producers = player.polygons.filter(p => p.isProducer);
-          const resourceGain = producers.reduce((sum, p) => sum + (p.size / 20), 0);
+          const resourceGain = producers.reduce((sum, p) => sum + (p.sides * 0.5), 0);
           if (resourceGain > 0) {
             player.resources += resourceGain;
           }
