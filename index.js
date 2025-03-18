@@ -358,6 +358,20 @@ setInterval(() => {
 
       // Broadcast game end and scores
       io.to(gameId).emit('gameEnd', { scores });
+      
+      // Set timeout to restart game after 20 seconds
+      setTimeout(() => {
+        // Reset game state
+        game.isFinished = false;
+        game.startTime = Date.now();
+        game.enemies = [];
+        for (const pid in game.players) {
+          game.players[pid].polygons = [];
+          game.players[pid].resources = 100;
+        }
+        // Notify clients of game restart
+        io.to(gameId).emit('gameRestart');
+      }, 20000);
     }
   }
 }, 100);

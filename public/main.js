@@ -636,9 +636,19 @@ socket.on('gameEnd', (data) => {
 
     scoresDiv.innerHTML = data.scores.map(score => 
         `<div style="color: ${score.color}">Player: ${score.id === playerId ? 'YOU' : 'Player'} - Score: ${score.score}</div>`
-    ).join('');
+    ).join('') + '<div style="margin-top: 10px">New game starting in 20 seconds...</div>';
 
     leaderboard.style.display = 'block';
+});
+
+socket.on('gameRestart', () => {
+    isGameEnded = false;
+    gameStartTime = Date.now();
+    selectedPolygon = null;
+    resources = 100;
+    document.getElementById('leaderboard').style.display = 'none';
+    updateTimer();
+    updateDisplay();
 });
 
 // Start everything
