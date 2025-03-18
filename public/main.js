@@ -160,6 +160,28 @@ socket.on('enemySpawned', (enemy) => {
     updateDisplay();
 });
 
+socket.on('fighterSpawned', (data) => {
+    console.log('Fighter spawned:', data);
+    const parentPolygon = findPolygonInGame(data.parentId);
+    if (parentPolygon) {
+        if (!parentPolygon.fighters) {
+            parentPolygon.fighters = [];
+        }
+        parentPolygon.fighters.push(data.fighter);
+    }
+});
+
+function findPolygonInGame(id) {
+    for (const pid in players) {
+        const player = players[pid];
+        if (player.polygons) {
+            const polygon = player.polygons.find(p => p.id === id);
+            if (polygon) return polygon;
+        }
+    }
+    return null;
+}
+
 // Mouse tracking
 canvas.addEventListener('mousemove', (e) => {
     mouseX = e.clientX;
@@ -502,6 +524,20 @@ function render() {
                 const isSelected = (polygon === selectedPolygon);
                 const isOwnedByMe = (pid === playerId);
                 drawPolygon(polygon, isSelected, isOwnedByMe);
+            }
+        }
+    }
+
+    // Draw fighters for all polygons
+    for (const pid in players) {
+        const player = players[pid];
+        if (player && player.polygons) {
+            for (const polygon of player.polygons) {
+                if (polygon.fighters) {
+                    for (const fighter of polygon.fighters) {
+                        drawPolygon(fighter, false, pid === playerId, false);
+                    }
+                }
             }
         }
     }
