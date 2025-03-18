@@ -1,3 +1,19 @@
-"scripts": {
-  "start": "node server.js"
+{
+  "name": "polygon-warfare",
+  "version": "1.0.0",
+  "description": "Multiplayer Polygon Warfare game",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js"
+  },
+  "dependencies": {
+    "express": "^4.21.2",
+    "socket.io": "^4.8.1"
+  },
+  "engines": {
+    "node": "16.x"
+  },
+  "license": "MIT",
+  "keywords": [],
+  "author": ""
 }
