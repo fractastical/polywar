@@ -388,17 +388,41 @@ setInterval(() => {
       const player = game.players[playerId];
       if (player.polygons) {
         player.polygons.forEach(polygon => {
-          if (polygon.isProducer === false) { // Combat polygon
+          // Ensure isProducer is properly checked and initialized
+          if (polygon.isProducer === false) {
+            // Initialize spawn properties if not set
             if (!polygon.lastSpawnTime) {
               polygon.lastSpawnTime = now;
-              polygon.spawnInterval = 3000; // 3 seconds between spawns
+              polygon.spawnInterval = 3000;
+              polygon.fighters = [];
             }
             
-            const timeSinceLastSpawn = now - polygon.lastSpawnTime;
-            if (timeSinceLastSpawn >= polygon.spawnInterval) {
-              console.log("Spawning fighter from combat polygon:", polygon.id, "isProducer:", polygon.isProducer);
-              spawnFighter(game, polygon);
+            // Check if enough time has passed to spawn
+            if (now - polygon.lastSpawnTime >= polygon.spawnInterval) {
+              const fighter = {
+                id: Date.now() + Math.random(),
+                x: polygon.x + (Math.random() * 40 - 20),
+                y: polygon.y + (Math.random() * 40 - 20),
+                sides: polygon.sides,
+                size: polygon.size * 0.75,
+                color: polygon.color,
+                ownerId: polygon.ownerId,
+                rotation: 0,
+                targetX: polygon.x + (Math.random() * 200 - 100),
+                targetY: polygon.y + (Math.random() * 200 - 100),
+                parentId: polygon.id
+              };
+
+              // Add to game enemies and update spawn time
+              game.enemies.push(fighter);
               polygon.lastSpawnTime = now;
+
+              // Emit the spawn event
+              io.to(game.id).emit('fighterSpawned', {
+                fighter: fighter,
+                polygonId: polygon.id,
+                ownerId: polygon.ownerId
+              });
             }
           }
         });
