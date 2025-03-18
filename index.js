@@ -243,7 +243,22 @@ function checkCollisions(game) {
 
         if (distance < polygon.size + enemy.size) {
           // Combat rules
-          if (polygon.sides === enemy.sides + 1) {
+          if (polygon.sides === enemy.sides) {
+            // Both polygons destroy each other if they have the same number of sides
+            game.enemies.splice(j, 1);
+            player.polygons.splice(i, 1);
+            
+            io.to(game.id).emit('enemyRemoved', {
+              enemyId: enemy.id,
+              playerId: playerId
+            });
+            io.to(game.id).emit('polygonRemoved', {
+              polygonId: polygon.id,
+              playerId: playerId
+            });
+            break;
+          }
+          else if (polygon.sides === enemy.sides + 1) {
             // Player polygon wins if it has exactly one more side
             game.enemies.splice(j, 1);
             player.resources += Math.floor(enemy.sides * 5);
