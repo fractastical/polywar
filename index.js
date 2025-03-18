@@ -12,6 +12,7 @@ app.use(express.static('public'));
 // Game state
 const games = {};
 const players = {};
+const winnersHistory = {}; // Track winners by game ID
 const GAME_DURATION = 5 * 60 * 1000; // 5 minutes in milliseconds
 
 // Socket.io connection handling
@@ -356,8 +357,20 @@ setInterval(() => {
         color: player.color
       })).sort((a, b) => b.score - a.score);
 
-      // Broadcast game end and scores
-      io.to(gameId).emit('gameEnd', { scores });
+      // Save winners to history
+      if (!winnersHistory[gameId]) {
+        winnersHistory[gameId] = [];
+      }
+      winnersHistory[gameId].push({
+        timestamp: Date.now(),
+        scores: scores.slice(0, 3) // Save top 3
+      });
+
+      // Broadcast game end, scores and history
+      io.to(gameId).emit('gameEnd', { 
+        scores,
+        history: winnersHistory[gameId]
+      });
       
       // Set timeout to restart game after 20 seconds
       setTimeout(() => {

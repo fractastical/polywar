@@ -634,9 +634,25 @@ socket.on('gameEnd', (data) => {
     const leaderboard = document.getElementById('leaderboard');
     const scoresDiv = document.getElementById('scores');
 
-    scoresDiv.innerHTML = data.scores.map(score => 
+    const currentScores = data.scores.map(score => 
         `<div style="color: ${score.color}">Player: ${score.id === playerId ? 'YOU' : 'Player'} - Score: ${score.score}</div>`
-    ).join('') + '<div style="margin-top: 10px">New game starting in 20 seconds...</div>';
+    ).join('');
+    
+    const history = data.history ? `
+        <div style="margin-top: 20px; border-top: 1px solid #ccc;">
+            <h3>Past Winners</h3>
+            ${data.history.slice(-5).reverse().map(entry => `
+                <div style="margin: 5px 0">
+                    ${new Date(entry.timestamp).toLocaleTimeString()}: 
+                    ${entry.scores.map((s, i) => `#${i + 1}: Score ${s.score}`).join(', ')}
+                </div>
+            `).join('')}
+        </div>
+    ` : '';
+
+    scoresDiv.innerHTML = currentScores + 
+        '<div style="margin-top: 10px">New game starting in 20 seconds...</div>' +
+        history;
 
     leaderboard.style.display = 'block';
 });
