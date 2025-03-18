@@ -159,6 +159,19 @@ io.on('connection', (socket) => {
   });
 
   // Handle disconnection
+  socket.on('spawnFighter', (data) => {
+    const game = games[socket.gameId];
+    if (!game) return;
+    
+    const player = game.players[socket.id];
+    if (!player || !player.polygons) return;
+
+    const polygon = player.polygons.find(p => p.id === data.polygonId);
+    if (polygon && !polygon.isProducer) {
+      spawnFighter(game, polygon);
+    }
+  });
+
   socket.on('disconnect', () => {
     console.log('Player disconnected:', socket.id);
 

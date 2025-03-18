@@ -221,6 +221,15 @@ window.addEventListener('keydown', (e) => {
         }
     }
 
+    // F key spawns a fighter from selected combat polygon
+    if (e.key === 'f' || e.key === 'F') {
+        if (selectedPolygon && !selectedPolygon.isProducer) {
+            socket.emit('spawnFighter', {
+                polygonId: selectedPolygon.id
+            });
+        }
+    }
+
     // Escape cancels placement mode
     if (e.key === 'Escape') {
         currentMode = null;
