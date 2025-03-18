@@ -257,9 +257,9 @@ canvas.addEventListener('click', (e) => {
             // If within radius, check for overlaps with all players' polygons
             if (canPlace) {
                 for (const pid in players) {
-                const player = players[pid];
-                if (player.polygons) {
-                    for (const polygon of player.polygons) {
+                    const player = players[pid];
+                    if (player.polygons) {
+                        for (const polygon of player.polygons) {
                         const distance = Math.sqrt(
                             Math.pow(polygon.x - e.clientX, 2) + 
                             Math.pow(polygon.y - e.clientY, 2)
