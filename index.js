@@ -373,16 +373,15 @@ setInterval(() => {
       const player = game.players[playerId];
       if (player.polygons) {
         player.polygons.forEach(polygon => {
-          // Make sure polygon has isProducer property defined
-          if (polygon.isProducer === false) {
+          if (polygon.isProducer === false) { // Combat polygon
             if (!polygon.lastSpawnTime) {
               polygon.lastSpawnTime = now;
               polygon.spawnInterval = 3000; // 3 seconds between spawns
-              polygon.fighters = [];
             }
             
-            if (now - polygon.lastSpawnTime >= polygon.spawnInterval) {
-              console.log("Spawning fighter from combat polygon:", polygon.id);
+            const timeSinceLastSpawn = now - polygon.lastSpawnTime;
+            if (timeSinceLastSpawn >= polygon.spawnInterval) {
+              console.log("Spawning fighter from combat polygon:", polygon.id, "isProducer:", polygon.isProducer);
               spawnFighter(game, polygon);
               polygon.lastSpawnTime = now;
             }

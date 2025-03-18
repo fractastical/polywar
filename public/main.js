@@ -239,7 +239,7 @@ canvas.addEventListener('click', (e) => {
             // Check if the placement location is within radius of own polygons and not overlapping
             let canPlace = false;
             const placementRadius = 150; // Maximum distance from existing polygons
-            
+
             // Allow first polygon anywhere, subsequent ones need to be within radius
             if (!players[playerId] || !players[playerId].polygons || players[playerId].polygons.length === 0) {
                 canPlace = true;
@@ -297,7 +297,7 @@ canvas.addEventListener('click', (e) => {
                     sides: currentMode,
                     size: info.size,
                     cost: cost,
-                    isProducer: placementMode // Added isProducer flag
+                    isProducer: isProducerMode // Use the mode toggle variable
                 });
             }
         }
@@ -458,7 +458,7 @@ function drawPlacementPreview() {
 
         // Check if the placement location is within radius and valid
         let canPlace = false;
-        
+
         // Check if within radius of any owned polygon
         if (players[playerId] && players[playerId].polygons) {
             for (const ownedPolygon of players[playerId].polygons) {
@@ -672,7 +672,7 @@ socket.on('gameEnd', (data) => {
     const currentScores = data.scores.map(score => 
         `<div style="color: ${score.color}">Player: ${score.id === playerId ? 'YOU' : 'Player'} - Score: ${score.score}</div>`
     ).join('');
-    
+
     const history = data.history ? `
         <div style="margin-top: 20px; border-top: 1px solid #ccc;">
             <h3>Past Winners</h3>
