@@ -11,6 +11,8 @@ let selectedPolygon = null;
 let currentMode = null;
 let mouseX = 0;
 let mouseY = 0;
+let gameStartTime = null;
+let isGameEnded = false;
 
 // Canvas setup
 const canvas = document.getElementById('gameCanvas');
@@ -62,6 +64,8 @@ socket.on('gameState', (gameState) => {
     }
 
     updateDisplay();
+    gameStartTime = Date.now();
+    updateTimer();
 });
 
 socket.on('playerJoined', (player) => {
@@ -607,6 +611,34 @@ function gameLoop() {
 window.addEventListener('resize', () => {
     canvas.width = window.innerWidth;
     canvas.height = window.innerHeight;
+});
+
+// Timer functions
+function updateTimer() {
+    if (isGameEnded) return;
+    const now = Date.now();
+    const timeLeft = Math.max(0, 300000 - (now - gameStartTime)); // 5 minutes = 300000 milliseconds
+    const minutes = Math.floor(timeLeft / 60000);
+    const seconds = Math.floor((timeLeft % 60000) / 1000);
+    document.getElementById('timer').textContent = `${minutes}:${seconds < 10 ? '0' : ''}${seconds}`;
+    if (timeLeft > 0) {
+        setTimeout(updateTimer, 1000);
+    } else {
+        socket.emit('endGame');
+    }
+}
+
+
+socket.on('gameEnd', (data) => {
+    isGameEnded = true;
+    const leaderboard = document.getElementById('leaderboard');
+    const scoresDiv = document.getElementById('scores');
+
+    scoresDiv.innerHTML = data.scores.map(score => 
+        `<div style="color: ${score.color}">Player: ${score.id === playerId ? 'YOU' : 'Player'} - Score: ${score.score}</div>`
+    ).join('');
+
+    leaderboard.style.display = 'block';
 });
 
 // Start everything

@@ -53,9 +53,14 @@
         <div>Press <span class="key">R</span> to replicate selected polygon</div>
     </div>
     <div id="status">
+        <div>Time Left: <span id="timer">5:00</span></div>
         <div>Resources: <span id="resources">100</span></div>
         <div>Your Polygons: <span id="polygonCount">0</span></div>
         <div>Enemies: <span id="enemyCount">0</span></div>
+        <div id="leaderboard" style="display: none;">
+            <h3>Final Scores</h3>
+            <div id="scores"></div>
+        </div>
     </div>
     
     <script src="/socket.io/socket.io.js"></script>

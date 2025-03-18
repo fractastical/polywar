@@ -12,6 +12,7 @@ app.use(express.static('public'));
 // Game state
 const games = {};
 const players = {};
+const GAME_DURATION = 5 * 60 * 1000; // 5 minutes in milliseconds
 
 // Socket.io connection handling
 io.on('connection', (socket) => {
@@ -33,7 +34,9 @@ io.on('connection', (socket) => {
         id: gameId,
         players: {},
         enemies: [],
-        lastUpdate: Date.now()
+        lastUpdate: Date.now(),
+        startTime: Date.now(),
+        isFinished: false
       };
     }
 
@@ -281,9 +284,15 @@ function spawnEnemy(game) {
   io.to(game.id).emit('enemySpawned', enemy);
 }
 
+// Calculate total sides for a player
+function calculatePlayerScore(player) {
+  return player.polygons ? player.polygons.reduce((sum, poly) => sum + poly.sides, 0) : 0;
+}
+
 // Game loop
 setInterval(() => {
-  // Update each game
+  // Update each game and check for time
+  const now = Date.now();
   for (const gameId in games) {
     const game = games[gameId];
     const now = Date.now();
@@ -334,6 +343,21 @@ setInterval(() => {
           }
         });
       }
+    }
+
+    // Check if game should end
+    if (!game.isFinished && (now - game.startTime) >= GAME_DURATION) {
+      game.isFinished = true;
+      
+      // Calculate final scores
+      const scores = Object.entries(game.players).map(([id, player]) => ({
+        id,
+        score: calculatePlayerScore(player),
+        color: player.color
+      })).sort((a, b) => b.score - a.score);
+
+      // Broadcast game end and scores
+      io.to(gameId).emit('gameEnd', { scores });
     }
   }
 }, 100);
