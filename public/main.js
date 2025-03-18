@@ -260,15 +260,16 @@ canvas.addEventListener('click', (e) => {
                     const player = players[pid];
                     if (player.polygons) {
                         for (const polygon of player.polygons) {
-                        const distance = Math.sqrt(
-                            Math.pow(polygon.x - e.clientX, 2) + 
-                            Math.pow(polygon.y - e.clientY, 2)
-                        );
+                            const distance = Math.sqrt(
+                                Math.pow(polygon.x - e.clientX, 2) + 
+                                Math.pow(polygon.y - e.clientY, 2)
+                            );
 
-                        // If distance is less than the sum of radii, they overlap
-                        if (distance < polygon.size + info.size) {
-                            canPlace = false;
-                            break;
+                            // If distance is less than the sum of radii, they overlap
+                            if (distance < polygon.size + info.size) {
+                                canPlace = false;
+                                break;
+                            }
                         }
                     }
                 }
