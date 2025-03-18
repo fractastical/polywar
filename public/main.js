@@ -473,8 +473,6 @@ function drawPlacementPreview() {
         }
 
         // If within radius, check for overlaps
-        if (canPlace) {
-
         // Check against all players' polygons
         for (const pid in players) {
             const player = players[pid];
