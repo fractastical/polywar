@@ -254,11 +254,9 @@ canvas.addEventListener('click', (e) => {
                 }
             }
 
-            // If within radius, check for overlaps
+            // If within radius, check for overlaps with all players' polygons
             if (canPlace) {
-
-            // Check against all players' polygons
-            for (const pid in players) {
+                for (const pid in players) {
                 const player = players[pid];
                 if (player.polygons) {
                     for (const polygon of player.polygons) {
