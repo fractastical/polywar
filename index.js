@@ -19,12 +19,26 @@ const GAME_DURATION = 5 * 60 * 1000; // 5 minutes in milliseconds
 io.on('connection', (socket) => {
   console.log('New player connected:', socket.id);
 
-  // Create a new player
+  // Create a new player with initial triangle
+  const initialTriangle = {
+    id: Date.now() + Math.random(),
+    x: Math.random() * 800 + 100, // Random position away from edges
+    y: Math.random() * 400 + 100,
+    sides: 3,
+    size: 20,
+    color: getRandomColor(),
+    ownerId: socket.id,
+    rotation: 0,
+    targetX: null,
+    targetY: null,
+    isProducer: true
+  };
+
   players[socket.id] = {
     id: socket.id,
-    color: getRandomColor(),
+    color: initialTriangle.color,
     resources: 100,
-    polygons: []
+    polygons: [initialTriangle]
   };
 
   // Join or create a game

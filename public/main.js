@@ -236,8 +236,26 @@ canvas.addEventListener('click', (e) => {
             const info = polygonInfo[currentMode];
             const placementMode = isProducerMode; // Determine placement mode
 
-            // Check if the placement location overlaps with existing polygons
-            let canPlace = true;
+            // Check if the placement location is within radius of own polygons and not overlapping
+            let canPlace = false;
+            const placementRadius = 150; // Maximum distance from existing polygons
+            
+            // First check if we're within radius of any of our polygons
+            if (players[playerId] && players[playerId].polygons) {
+                for (const ownedPolygon of players[playerId].polygons) {
+                    const distance = Math.sqrt(
+                        Math.pow(ownedPolygon.x - e.clientX, 2) + 
+                        Math.pow(ownedPolygon.y - e.clientY, 2)
+                    );
+                    if (distance <= placementRadius) {
+                        canPlace = true;
+                        break;
+                    }
+                }
+            }
+
+            // If within radius, check for overlaps
+            if (canPlace) {
 
             // Check against all players' polygons
             for (const pid in players) {
@@ -435,9 +453,27 @@ function drawPolygon(polygon, isSelected, isOwned = true, isEnemy = false) {
 function drawPlacementPreview() {
     if (currentMode !== null) {
         const info = polygonInfo[currentMode];
+        const placementRadius = 150;
 
-        // Check if the placement location is valid
-        let canPlace = true;
+        // Check if the placement location is within radius and valid
+        let canPlace = false;
+        
+        // Check if within radius of any owned polygon
+        if (players[playerId] && players[playerId].polygons) {
+            for (const ownedPolygon of players[playerId].polygons) {
+                const distance = Math.sqrt(
+                    Math.pow(ownedPolygon.x - mouseX, 2) + 
+                    Math.pow(ownedPolygon.y - mouseY, 2)
+                );
+                if (distance <= placementRadius) {
+                    canPlace = true;
+                    break;
+                }
+            }
+        }
+
+        // If within radius, check for overlaps
+        if (canPlace) {
 
         // Check against all players' polygons
         for (const pid in players) {
