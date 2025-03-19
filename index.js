@@ -269,9 +269,9 @@ function checkCollisions(game) {
         const distance = Math.sqrt(dx * dx + dy * dy);
 
         if (distance < polygon.size + enemy.size) {
-          // Combat rules
+          // Collision rules
           if (polygon.sides === enemy.sides) {
-            // Both polygons destroy each other if they have the same number of sides
+            // Both polygons destroy each other
             game.enemies.splice(j, 1);
             player.polygons.splice(i, 1);
 
@@ -286,7 +286,7 @@ function checkCollisions(game) {
             break;
           }
           else if (polygon.sides === enemy.sides + 1) {
-            // Player polygon wins if it has exactly one more side
+            // Higher number wins
             game.enemies.splice(j, 1);
             player.resources += Math.floor(enemy.sides * 5);
 
@@ -297,7 +297,7 @@ function checkCollisions(game) {
             break;
           } 
           else if (enemy.sides === polygon.sides + 1) {
-            // Enemy wins if it has exactly one more side
+            // Higher number wins
             player.polygons.splice(i, 1);
 
             io.to(game.id).emit('polygonRemoved', {
@@ -310,24 +310,31 @@ function checkCollisions(game) {
             // Bounce off each other
             const angle = Math.atan2(dy, dx);
             const overlap = (polygon.size + enemy.size) - distance;
-
+            
+            // Stronger bounce effect
+            const bounceForce = 2.0;
+            
             // Move polygons apart
-            polygon.x += Math.cos(angle) * overlap/2;
-            polygon.y += Math.sin(angle) * overlap/2;
-            enemy.x -= Math.cos(angle) * overlap/2;
-            enemy.y -= Math.sin(angle) * overlap/2;
+            polygon.x += Math.cos(angle) * overlap * bounceForce;
+            polygon.y += Math.sin(angle) * overlap * bounceForce;
+            enemy.x -= Math.cos(angle) * overlap * bounceForce;
+            enemy.y -= Math.sin(angle) * overlap * bounceForce;
 
-            // Bounce velocities if they have momentum
+            // Calculate reflection vector
             if (polygon.targetX !== null) {
-              const tempX = polygon.targetX;
-              const tempY = polygon.targetY;
-              polygon.targetX = polygon.x - (polygon.targetX - polygon.x);
-              polygon.targetY = polygon.y - (polygon.targetY - polygon.y);
+              const dx = polygon.targetX - polygon.x;
+              const dy = polygon.targetY - polygon.y;
+              const dotProduct = (dx * Math.cos(angle) + dy * Math.sin(angle)) * 2;
+              polygon.targetX = polygon.x + (dx - dotProduct * Math.cos(angle));
+              polygon.targetY = polygon.y + (dy - dotProduct * Math.sin(angle));
             }
 
             if (enemy.targetX !== null) {
-              enemy.targetX = enemy.x - (enemy.targetX - enemy.x);
-              enemy.targetY = enemy.y - (enemy.targetY - enemy.y);
+              const dx = enemy.targetX - enemy.x;
+              const dy = enemy.targetY - enemy.y;
+              const dotProduct = (dx * -Math.cos(angle) + dy * -Math.sin(angle)) * 2;
+              enemy.targetX = enemy.x + (dx - dotProduct * -Math.cos(angle));
+              enemy.targetY = enemy.y + (dy - dotProduct * -Math.sin(angle));
             }
           }
         }
@@ -497,7 +504,7 @@ function spawnFighter(game, polygon) {
     x: polygon.x + (Math.random() * 40 - 20), // Spawn with slight offset
     y: polygon.y + (Math.random() * 40 - 20),
     sides: polygon.sides,
-    size: polygon.size * 0.75,
+    size: polygon.size * 0.375,
     color: polygon.color,
     ownerId: polygon.ownerId,
     rotation: 0,

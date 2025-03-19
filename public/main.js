@@ -693,9 +693,17 @@ function gameLoop() {
                 enemy.y += (dy / distance) * speed;
 
                 // If it reaches target, set new random target for regular enemies
+                // Only regular enemies get new random targets
                 if (!enemy.isFighter && distance < 10) {
                     enemy.targetX = Math.random() * canvas.width;
                     enemy.targetY = Math.random() * canvas.height;
+                } else if (enemy.isFighter && distance < 10) {
+                    // Fighters keep going in the same direction off screen
+                    const dx = enemy.targetX - enemy.x;
+                    const dy = enemy.targetY - enemy.y;
+                    const angle = Math.atan2(dy, dx);
+                    enemy.targetX = enemy.x + Math.cos(angle) * 2000;
+                    enemy.targetY = enemy.y + Math.sin(angle) * 2000;
                 }
             }
         }
