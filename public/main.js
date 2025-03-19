@@ -31,8 +31,7 @@ const polygonInfo = {
     9: { name: "Nonagon", cost: 115, size: 50, color: "#BFFF33", speed: 0.8, combatDamage: 45 }
 };
 
-let isProducerMode = true; // Toggle between producer and combat mode
-let isMoveMode = false; // Toggle for move mode
+let currentGameMode = 'producer'; // producer/combat/fighters modes
 
 // Socket.io event handlers
 socket.on('connect', () => {
@@ -191,11 +190,16 @@ canvas.addEventListener('mousemove', (e) => {
 
 // Keyboard handling
 window.addEventListener('keydown', (e) => {
-    // T key toggles between move mode and placement mode
+    // T key cycles between producer/combat/fighters modes
     if (e.key === 't' || e.key === 'T') {
-        isMoveMode = !isMoveMode;
-        currentMode = null;
-        console.log("Mode toggled:", isMoveMode ? "Move" : "Place");
+        if (currentGameMode === 'producer') {
+            currentGameMode = 'combat';
+        } else if (currentGameMode === 'combat') {
+            currentGameMode = 'fighters';
+        } else {
+            currentGameMode = 'producer';
+        }
+        console.log("Mode toggled:", currentGameMode);
         updateModeDisplay();
     }
 
@@ -397,10 +401,8 @@ function updateDisplay() {
 
 // Update mode display
 function updateModeDisplay() {
-    if (isMoveMode) {
-        document.getElementById('currentMode').textContent = "Move Mode - Select a polygon to move all fighters of that type";
-    } else if (currentMode === null) {
-        document.getElementById('currentMode').textContent = "None";
+    if (currentMode === null) {
+        document.getElementById('currentMode').textContent = currentGameMode.charAt(0).toUpperCase() + currentGameMode.slice(1);
     } else {
         const info = polygonInfo[currentMode];
         const type = isProducerMode ? "Producer" : "Combat";
