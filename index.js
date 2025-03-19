@@ -316,14 +316,25 @@ function checkCollisions(game) {
             const angle = Math.atan2(dy, dx);
             const overlap = (polygon.size + enemy.size) - distance;
 
-            // Stronger bounce effect
-            const bounceForce = 2.0;
+            // Much stronger bounce effect
+            const bounceForce = 5.0;
+            const minSeparation = 1.2; // Ensure they separate enough
 
-            // Move polygons apart
-            polygon.x += Math.cos(angle) * overlap * bounceForce;
-            polygon.y += Math.sin(angle) * overlap * bounceForce;
-            enemy.x -= Math.cos(angle) * overlap * bounceForce;
-            enemy.y -= Math.sin(angle) * overlap * bounceForce;
+            // Move polygons apart with minimum separation
+            polygon.x += Math.cos(angle) * overlap * bounceForce * minSeparation;
+            polygon.y += Math.sin(angle) * overlap * bounceForce * minSeparation;
+            enemy.x -= Math.cos(angle) * overlap * bounceForce * minSeparation;
+            enemy.y -= Math.sin(angle) * overlap * bounceForce * minSeparation;
+
+            // Reset their targets to prevent immediate re-collision
+            if (!polygon.isFighter) {
+                polygon.targetX = polygon.x;
+                polygon.targetY = polygon.y;
+            }
+            if (!enemy.isFighter) {
+                enemy.targetX = enemy.x;
+                enemy.targetY = enemy.y;
+            }
 
             // Calculate reflection vector
             if (polygon.targetX !== null) {
