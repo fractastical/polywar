@@ -406,8 +406,9 @@ function updateModeDisplay() {
     } else {
         const info = polygonInfo[currentMode];
         const type = currentGameMode.charAt(0).toUpperCase() + currentGameMode.slice(1);
+        const suffix = currentGameMode === 'fighters' ? 'Move' : `Cost: ${info.cost}`;
         document.getElementById('currentMode').textContent = 
-            `${info.name} - ${type} (Cost: ${info.cost})`;
+            `${info.name} - ${type} (${suffix})`;
     }
 }
 
