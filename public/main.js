@@ -638,7 +638,7 @@ function drawPlacementPreview() {
         }
 
         ctx.save();
-        ctx.translate(mouseX, mouseY);
+        ctx.translate(mouseX - canvas.width/2, mouseY - canvas.height/2);
         ctx.scale(zoomLevel, zoomLevel); // Apply zoom
 
         // Draw placement area indicator circle
