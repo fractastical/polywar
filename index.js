@@ -273,7 +273,7 @@ function checkCollisions(game) {
           if (polygon.sides === enemy.sides) {
             // Both polygons destroy each other
             game.enemies.splice(j, 1);
-            
+
             // Only remove player polygon if it's not a fighter (fighters are in enemies array)
             if (!polygon.isFighter) {
               player.polygons.splice(i, 1);
@@ -300,24 +300,25 @@ function checkCollisions(game) {
             });
             break;
           } 
-          else if (enemy.sides === polygon.sides + 1) {
+          else if (enemy.sides === polygon.sides + 1 || (enemy.isFighter && enemy.sides === polygon.sides + 1)) {
             // Higher number wins
-            player.polygons.splice(i, 1);
-
-            io.to(game.id).emit('polygonRemoved', {
-              polygonId: polygon.id,
-              playerId: playerId
-            });
+            if (!polygon.isFighter) {
+              player.polygons.splice(i, 1);
+              io.to(game.id).emit('polygonRemoved', {
+                polygonId: polygon.id,
+                playerId: playerId
+              });
+            }
             break;
           }
           else {
             // Bounce off each other
             const angle = Math.atan2(dy, dx);
             const overlap = (polygon.size + enemy.size) - distance;
-            
+
             // Stronger bounce effect
             const bounceForce = 2.0;
-            
+
             // Move polygons apart
             polygon.x += Math.cos(angle) * overlap * bounceForce;
             polygon.y += Math.sin(angle) * overlap * bounceForce;
@@ -498,7 +499,7 @@ function spawnFighter(game, polygon) {
   if (!polygon || polygon.isProducer) return; // Don't spawn fighters from producers
 
   console.log("Spawning fighter from polygon:", polygon.id);
-  
+
   // Update polygon's last spawn time
   polygon.lastSpawnTime = Date.now();
 
@@ -520,8 +521,7 @@ function spawnFighter(game, polygon) {
   };
 
   // Add to game state
-  if (!game.fighters) game.fighters = [];
-  game.fighters.push(fighter);
+  game.enemies.push(fighter); // Add fighter to enemies array
 
   // Broadcast spawn event to all players in the game
   io.to(game.id).emit('fighterSpawned', fighter);
