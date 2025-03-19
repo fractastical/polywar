@@ -32,6 +32,16 @@
             border-radius: 5px;
             font-size: 14px;
         }
+        #nameInput {
+            display: none;
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: rgba(0,0,0,0.8);
+            padding: 20px;
+            border-radius: 5px;
+        }
         .key {
             display: inline-block;
             background: #333;
@@ -43,10 +53,8 @@
 </head>
 <body>
     <canvas id="gameCanvas"></canvas>
-    <div id="nameInput" style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); background: rgba(0,0,0,0.9); padding: 20px; border-radius: 10px; text-align: center; display: none;">
-        <h3>Enter Your Name</h3>
-        <input type="text" id="playerName" style="margin: 10px; padding: 5px;">
-        <button onclick="setPlayerName()" style="padding: 5px 10px;">Set Name</button>
+    <div id="nameInput" style="display: none; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); background: rgba(0,0,0,0.8); padding: 20px; border-radius: 5px;">
+        <input type="text" id="playerName" placeholder="Enter your name">
     </div>
     <div id="info">
         <h2>Polygon Warfare</h2>
@@ -71,7 +79,7 @@
             <div id="scores"></div>
         </div>
     </div>
-    
+
     <script src="/socket.io/socket.io.js"></script>
     <script src="autom.js"></script>
     <script src="main.js"></script>

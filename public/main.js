@@ -206,6 +206,39 @@ window.addEventListener('keydown', (e) => {
         updateModeDisplay();
     }
 
+    // I key toggles instructions
+    if (e.key === 'i' || e.key === 'I') {
+        const info = document.getElementById('info');
+        info.style.display = info.style.display === 'none' ? 'block' : 'none';
+    }
+
+    // N key toggles name input
+    if (e.key === 'n' || e.key === 'N') {
+        const nameInput = document.getElementById('nameInput');
+        nameInput.style.display = nameInput.style.display === 'none' ? 'block' : 'none';
+        if (nameInput.style.display === 'block') {
+            document.getElementById('playerName').focus();
+        }
+    }
+
+    // S key starts automation sequence
+    if (e.key === 's' || e.key === 'S') {
+        if (!isAutomating) {
+            automationSystem.parseSequence(automationSequence);
+            isAutomating = true;
+            function automationLoop() {
+                if (isAutomating) {
+                    if (!automationSystem.executeNext()) {
+                        isAutomating = false;
+                    } else {
+                        setTimeout(automationLoop, 500);
+                    }
+                }
+            }
+            automationLoop();
+        }
+    }
+
     // Number keys 3-9 select polygon type
     const keyNum = parseInt(e.key);
     if (!isNaN(keyNum) && keyNum >= 3 && keyNum <= 9) {
