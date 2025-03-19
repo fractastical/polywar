@@ -393,12 +393,15 @@ function drawPolygon(polygon, isSelected, isOwned = true, isEnemy = false) {
     // Draw pulse effect for combat polygons that just spawned
     if (polygon.lastSpawnTime && !polygon.isProducer) {
         const timeSinceSpawn = Date.now() - polygon.lastSpawnTime;
-        if (timeSinceSpawn < 500) { // Show pulse for 500ms
-            const pulseSize = polygon.size + (10 * Math.sin((timeSinceSpawn / 500) * Math.PI));
+        if (timeSinceSpawn < 1000) { // Show pulse for 1 second
+            const pulseSize = polygon.size + (20 * Math.sin((timeSinceSpawn / 1000) * Math.PI));
             ctx.beginPath();
             ctx.arc(0, 0, pulseSize, 0, Math.PI * 2);
-            ctx.fillStyle = `rgba(255, 215, 0, ${0.3 * (1 - timeSinceSpawn/500)})`;
+            ctx.fillStyle = `rgba(255, 165, 0, ${0.6 * (1 - timeSinceSpawn/1000)})`;
             ctx.fill();
+            ctx.strokeStyle = 'rgba(255, 215, 0, 0.8)';
+            ctx.lineWidth = 3;
+            ctx.stroke();
         }
     }
 

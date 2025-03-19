@@ -487,6 +487,9 @@ function spawnFighter(game, polygon) {
   if (!polygon || polygon.isProducer) return; // Don't spawn fighters from producers
 
   console.log("Spawning fighter from polygon:", polygon.id);
+  
+  // Update polygon's last spawn time
+  polygon.lastSpawnTime = Date.now();
 
   // Create the fighter with combat properties
   const fighter = {
