@@ -364,7 +364,12 @@ function spawnEnemy(game) {
 
 // Calculate total sides for a player
 function calculatePlayerScore(player) {
-  return player.polygons ? player.polygons.reduce((sum, poly) => sum + poly.sides, 0) : 0;
+  let score = 0;
+  if (player.polygons) {
+    score += player.polygons.reduce((sum, poly) => sum + (poly.sides * (poly.isProducer ? 1 : 2)), 0);
+    score += Math.floor(player.resources / 10);
+  }
+  return score;
 }
 
 // Game loop

@@ -390,6 +390,18 @@ function drawPolygon(polygon, isSelected, isOwned = true, isEnemy = false) {
     ctx.translate(polygon.x, polygon.y);
     ctx.rotate(polygon.rotation || 0);
 
+    // Draw pulse effect for combat polygons that just spawned
+    if (polygon.lastSpawnTime && !polygon.isProducer) {
+        const timeSinceSpawn = Date.now() - polygon.lastSpawnTime;
+        if (timeSinceSpawn < 500) { // Show pulse for 500ms
+            const pulseSize = polygon.size + (10 * Math.sin((timeSinceSpawn / 500) * Math.PI));
+            ctx.beginPath();
+            ctx.arc(0, 0, pulseSize, 0, Math.PI * 2);
+            ctx.fillStyle = `rgba(255, 215, 0, ${0.3 * (1 - timeSinceSpawn/500)})`;
+            ctx.fill();
+        }
+    }
+
     // Draw selection circle if selected
     if (isSelected) {
         ctx.beginPath();
