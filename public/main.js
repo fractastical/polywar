@@ -14,6 +14,7 @@ let mouseY = 0;
 let gameStartTime = null;
 let isGameEnded = false;
 let zoomLevel = 1.0; // Initialize zoom level
+let isAutomating = false; // Initialize automation state
 
 // Canvas setup
 const canvas = document.getElementById('gameCanvas');
