@@ -376,8 +376,8 @@ canvas.addEventListener('click', (e) => {
 
             if (canPlace) {
                 socket.emit('placePolygon', {
-                    x: e.clientX - canvas.width / 2,
-                    y: e.clientY - canvas.height / 2,
+                    x: (e.clientX - canvas.width / 2) / zoomLevel,
+                    y: (e.clientY - canvas.height / 2) / zoomLevel,
                     sides: currentMode,
                     size: info.size,
                     cost: cost,

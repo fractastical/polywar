@@ -267,9 +267,13 @@ function checkCollisions(game) {
       for (let j = game.enemies.length - 1; j >= 0; j--) {
         const enemy = game.enemies[j];
 
-        const dx = polygon.x - enemy.x;
-        const dy = polygon.y - enemy.y;
+        // Use the actual positions for collision detection
+        const dx = (polygon.x || 0) - (enemy.x || 0);
+        const dy = (polygon.y || 0) - (enemy.y || 0);
         const distance = Math.sqrt(dx * dx + dy * dy);
+
+        // Adjust collision radius based on size
+        const collisionRadius = (polygon.size + enemy.size) * 0.8;
 
         if (distance < polygon.size + enemy.size) {
           // Collision rules
