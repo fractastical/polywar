@@ -222,6 +222,12 @@ window.addEventListener('keydown', (e) => {
         }
     }
 
+    // H key toggles tutorial
+    if (e.key === 'h' || e.key === 'H') {
+        const tutorial = document.getElementById('tutorial');
+        tutorial.style.display = tutorial.style.display === 'none' ? 'block' : 'none';
+    }
+
     // S key starts automation sequence
     if (e.key === 's' || e.key === 'S') {
         if (!isAutomating) {

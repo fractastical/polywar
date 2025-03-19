@@ -40,6 +40,30 @@
             transform: translate(-50%, -50%);
             background: rgba(0,0,0,0.8);
             padding: 20px;
+
+        #tutorial {
+            display: none;
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: rgba(0, 0, 0, 0.9);
+            padding: 20px;
+            border-radius: 10px;
+            color: white;
+            max-width: 600px;
+            max-height: 80vh;
+            overflow-y: auto;
+            z-index: 1000;
+        }
+        .tutorial-section {
+            margin-bottom: 15px;
+        }
+        .tutorial-section h3 {
+            color: #4CAF50;
+            margin-bottom: 5px;
+        }
+
             border-radius: 5px;
         }
         .key {
@@ -54,6 +78,47 @@
 <body>
     <canvas id="gameCanvas"></canvas>
     <div id="nameInput" style="display: none; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); background: rgba(0,0,0,0.8); padding: 20px; border-radius: 5px;">
+
+    <div id="tutorial">
+        <h2>Polygon Warfare Tutorial</h2>
+        
+        <div class="tutorial-section">
+            <h3>Basics</h3>
+            <p>Build a network of polygons to generate resources and defend against enemies.</p>
+        </div>
+        
+        <div class="tutorial-section">
+            <h3>Controls</h3>
+            <p>- Press <span class="key">T</span> to toggle between Producer/Combat modes</p>
+            <p>- Use <span class="key">3</span>-<span class="key">9</span> to select polygon sides</p>
+            <p>- Click to place polygons</p>
+            <p>- Right-click to move polygons</p>
+        </div>
+        
+        <div class="tutorial-section">
+            <h3>Polygon Types</h3>
+            <p><strong>Producers:</strong> Generate resources over time based on sides</p>
+            <p><strong>Combat:</strong> Automatically spawn fighters to defend territory</p>
+        </div>
+        
+        <div class="tutorial-section">
+            <h3>Strategy</h3>
+            <p>- Start with producer polygons to generate resources</p>
+            <p>- Build combat polygons near edges to defend</p>
+            <p>- More sides = more cost but more power</p>
+            <p>- Keep producers protected behind combat units</p>
+        </div>
+
+        <div class="tutorial-section">
+            <h3>Combat Rules</h3>
+            <p>- Equal sides destroy each other</p>
+            <p>- One more side beats lower number</p>
+            <p>- Other combinations bounce off</p>
+        </div>
+        
+        <p>Press <span class="key">H</span> to close this tutorial</p>
+    </div>
+
         <input type="text" id="playerName" placeholder="Enter your name">
     </div>
     <div id="info">
