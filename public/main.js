@@ -13,6 +13,7 @@ let mouseX = 0;
 let mouseY = 0;
 let gameStartTime = null;
 let isGameEnded = false;
+let zoomLevel = 1.0; // Initialize zoom level
 
 // Canvas setup
 const canvas = document.getElementById('gameCanvas');
@@ -71,6 +72,8 @@ socket.on('gameState', (gameState) => {
 socket.on('playerJoined', (player) => {
     console.log('Player joined:', player);
     players[player.id] = player;
+    zoomLevel -= 0.1; // Zoom out by 10%
+    zoomLevel = Math.max(0.2, zoomLevel); // Prevent zooming in too far
     updateDisplay();
 });
 
@@ -232,7 +235,7 @@ window.addEventListener('keydown', (e) => {
                 polygonId: selectedPolygon.id,
                 gameId: gameId
             });
-            
+
             // Add visual feedback
             selectedPolygon.lastSpawnTime = Date.now();
         } else {
@@ -256,7 +259,7 @@ canvas.addEventListener('click', (e) => {
             enemy.sides === selectedPolygon.sides && 
             enemy.ownerId === playerId
         );
-        
+
         // Move all matching fighters to clicked location
         fighters.forEach(fighter => {
             fighter.targetX = e.clientX;
@@ -417,6 +420,7 @@ function drawPolygon(polygon, isSelected, isOwned = true, isEnemy = false) {
     ctx.save();
     ctx.translate(polygon.x, polygon.y);
     ctx.rotate(polygon.rotation || 0);
+    ctx.scale(zoomLevel, zoomLevel); // Apply zoom
 
     // Draw pulse effect for combat polygons that just spawned
     if (polygon.lastSpawnTime && !polygon.isProducer) {
@@ -505,6 +509,45 @@ function drawPolygon(polygon, isSelected, isOwned = true, isEnemy = false) {
     ctx.restore();
 }
 
+function drawFighter(enemy, parent) {
+    ctx.save();
+    ctx.translate(enemy.x, enemy.y);
+    ctx.rotate(enemy.rotation || 0);
+    ctx.scale(zoomLevel, zoomLevel); // Apply zoom
+
+    // Draw glow
+    ctx.beginPath();
+    ctx.arc(0, 0, enemy.size + 5, 0, Math.PI * 2);
+    ctx.fillStyle = `rgba(255, 255, 0, 0.2)`;
+    ctx.fill();
+
+    // Draw fighter polygon
+    ctx.beginPath();
+    for (let i = 0; i < enemy.sides; i++) {
+        const angle = (i * 2 * Math.PI / enemy.sides);
+        const x = enemy.size * Math.cos(angle);
+        const y = enemy.size * Math.sin(angle);
+        if (i === 0) ctx.moveTo(x, y);
+        else ctx.lineTo(x, y);
+    }
+    ctx.closePath();
+    ctx.fillStyle = parent.color;
+    ctx.strokeStyle = '#FFD700';
+    ctx.lineWidth = 2;
+    ctx.fill();
+    ctx.stroke();
+
+    // Draw number
+    ctx.fillStyle = 'white';
+    ctx.font = '12px Arial';
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+    ctx.fillText(enemy.sides.toString(), 0, 0);
+
+    ctx.restore();
+}
+
+
 // Draw placement preview
 function drawPlacementPreview() {
     if (currentMode !== null) {
@@ -562,6 +605,7 @@ function drawPlacementPreview() {
 
         ctx.save();
         ctx.translate(mouseX, mouseY);
+        ctx.scale(zoomLevel, zoomLevel); // Apply zoom
 
         // Draw placement area indicator circle
         ctx.beginPath();
@@ -606,6 +650,9 @@ function drawPlacementPreview() {
 // Game render function
 function render() {
     ctx.clearRect(0, 0, canvas.width, canvas.height);
+    ctx.save(); // Save the context before transformations
+    ctx.translate(canvas.width / 2, canvas.height / 2); // Center the canvas
+    ctx.scale(zoomLevel, zoomLevel); // Apply zoom
 
     // Draw placement preview
     drawPlacementPreview();
@@ -624,51 +671,17 @@ function render() {
 
     // Draw enemy polygons and fighters
     for (const enemy of enemies) {
-        // If it's a fighter (has a parentId), draw it with special styling
         if (enemy.parentId) {
             const parent = findPolygonInGame(enemy.parentId);
             if (parent) {
-                // Draw with pulsing glow effect
-                ctx.save();
-                ctx.translate(enemy.x, enemy.y);
-                ctx.rotate(enemy.rotation || 0);
-
-                // Draw glow
-                ctx.beginPath();
-                ctx.arc(0, 0, enemy.size + 5, 0, Math.PI * 2);
-                ctx.fillStyle = `rgba(255, 255, 0, 0.2)`;
-                ctx.fill();
-
-                // Draw fighter polygon
-                ctx.beginPath();
-                for (let i = 0; i < enemy.sides; i++) {
-                    const angle = (i * 2 * Math.PI / enemy.sides);
-                    const x = enemy.size * Math.cos(angle);
-                    const y = enemy.size * Math.sin(angle);
-                    if (i === 0) ctx.moveTo(x, y);
-                    else ctx.lineTo(x, y);
-                }
-                ctx.closePath();
-                ctx.fillStyle = parent.color;
-                ctx.strokeStyle = '#FFD700';
-                ctx.lineWidth = 2;
-                ctx.fill();
-                ctx.stroke();
-
-                // Draw number
-                ctx.fillStyle = 'white';
-                ctx.font = '12px Arial';
-                ctx.textAlign = 'center';
-                ctx.textBaseline = 'middle';
-                ctx.fillText(enemy.sides.toString(), 0, 0);
-
-                ctx.restore();
+                drawFighter(enemy, parent);
             }
         } else {
-            // Regular enemy
             drawPolygon(enemy, false, false, true);
         }
     }
+
+    ctx.restore(); // Restore the context after drawing
 }
 
 // Game loop
@@ -795,6 +808,7 @@ socket.on('gameRestart', () => {
     gameStartTime = Date.now();
     selectedPolygon = null;
     resources = 100;
+    zoomLevel = 1.0; // Reset zoom level
     document.getElementById('leaderboard').style.display = 'none';
     updateTimer();
     updateDisplay();
