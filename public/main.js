@@ -166,13 +166,9 @@ socket.on('enemySpawned', (enemy) => {
 
 socket.on('fighterSpawned', (fighter) => {
     console.log('Fighter spawned:', fighter);
-    if (fighter && !enemies.some(e => e.id === fighter.id)) {
-        enemies.push({
-            ...fighter,
-            sides: fighter.sides || 3,
-            rotation: fighter.rotation || 0
-        });
-    }
+    // Add the fighter to the enemies array
+    enemies.push(fighter);
+    console.log('Fighter added to game, total enemies:', enemies.length);
 });
 
 function findPolygonInGame(id) {
