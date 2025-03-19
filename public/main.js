@@ -313,22 +313,24 @@ canvas.addEventListener('click', (e) => {
             const isProducerMode = currentGameMode === 'producer';
 
             // Check if the placement location is within radius of own polygons and not overlapping
-            let canPlace = false;
+            let canPlace = true;
             const placementRadius = 150; // Maximum distance from existing polygons
 
             // Allow first polygon anywhere, subsequent ones need to be within radius
-            if (!players[playerId] || !players[playerId].polygons || players[playerId].polygons.length === 0) {
-                canPlace = true;
-            } else {
+            if (players[playerId] && players[playerId].polygons && players[playerId].polygons.length > 0) {
+                let withinRadius = false;
                 for (const ownedPolygon of players[playerId].polygons) {
                     const distance = Math.sqrt(
                         Math.pow(ownedPolygon.x - e.clientX, 2) + 
                         Math.pow(ownedPolygon.y - e.clientY, 2)
                     );
                     if (distance <= placementRadius) {
-                        canPlace = true;
+                        withinRadius = true;
                         break;
                     }
+                }
+                if (!withinRadius) {
+                    canPlace = false;
                 }
             }
 
