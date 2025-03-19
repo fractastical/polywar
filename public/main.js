@@ -32,6 +32,7 @@ const polygonInfo = {
 };
 
 let isProducerMode = true; // Toggle between producer and combat mode
+let isMoveMode = false; // Toggle for move mode
 
 // Socket.io event handlers
 socket.on('connect', () => {
@@ -190,10 +191,11 @@ canvas.addEventListener('mousemove', (e) => {
 
 // Keyboard handling
 window.addEventListener('keydown', (e) => {
-    // T key toggles between producer and combat mode
+    // T key toggles between move mode and placement mode
     if (e.key === 't' || e.key === 'T') {
-        isProducerMode = !isProducerMode;
-        console.log("Mode toggled:", isProducerMode ? "Producer" : "Combat");
+        isMoveMode = !isMoveMode;
+        currentMode = null;
+        console.log("Mode toggled:", isMoveMode ? "Move" : "Place");
         updateModeDisplay();
     }
 
@@ -241,8 +243,28 @@ window.addEventListener('keydown', (e) => {
     }
 });
 
-// Click to place or select polygons
+// Click to place, select, or move fighters
 canvas.addEventListener('click', (e) => {
+    if (isMoveMode && selectedPolygon) {
+        // Find all fighters of the same type
+        const fighters = enemies.filter(enemy => 
+            enemy.isFighter && 
+            enemy.sides === selectedPolygon.sides && 
+            enemy.ownerId === playerId
+        );
+        
+        // Move all matching fighters to clicked location
+        fighters.forEach(fighter => {
+            fighter.targetX = e.clientX;
+            fighter.targetY = e.clientY;
+            socket.emit('movePolygon', {
+                polygonId: fighter.id,
+                targetX: e.clientX,
+                targetY: e.clientY
+            });
+        });
+        return;
+    }
     if (currentMode !== null) {
         const cost = polygonInfo[currentMode].cost;
         if (resources >= cost) {
@@ -375,7 +397,9 @@ function updateDisplay() {
 
 // Update mode display
 function updateModeDisplay() {
-    if (currentMode === null) {
+    if (isMoveMode) {
+        document.getElementById('currentMode').textContent = "Move Mode - Select a polygon to move all fighters of that type";
+    } else if (currentMode === null) {
         document.getElementById('currentMode').textContent = "None";
     } else {
         const info = polygonInfo[currentMode];
