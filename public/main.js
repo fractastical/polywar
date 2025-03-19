@@ -249,7 +249,7 @@ window.addEventListener('keydown', (e) => {
 
 // Click to place, select, or move fighters
 canvas.addEventListener('click', (e) => {
-    if (isMoveMode && selectedPolygon) {
+    if (currentGameMode === 'fighters' && selectedPolygon) {
         // Find all fighters of the same type
         const fighters = enemies.filter(enemy => 
             enemy.isFighter && 
