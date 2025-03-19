@@ -15,6 +15,9 @@ let mouseX = 0;
 let mouseY = 0;
 let gameStartTime = null;
 let isGameEnded = false;
+let automationSystem = new AutomationSystem();
+let automationSequence = "3p,3c,4c,4p,5p,5c,5c";
+let isAutomating = false;
 
 // Canvas setup
 const canvas = document.getElementById('gameCanvas');
@@ -269,6 +272,25 @@ window.addEventListener('keydown', (e) => {
         nameInput.style.display = nameInput.style.display === 'none' ? 'block' : 'none';
         if (nameInput.style.display === 'block') {
             document.getElementById('playerName').focus();
+        }
+    }
+
+    // 'S' key starts automation
+    if (e.key === 's' || e.key === 'S') {
+        if (!isAutomating) {
+            automationSystem.parseSequence(automationSequence);
+            isAutomating = true;
+            // Start automation loop
+            function automationLoop() {
+                if (isAutomating) {
+                    if (!automationSystem.executeNext()) {
+                        isAutomating = false;
+                    } else {
+                        setTimeout(automationLoop, 500); // Wait 500ms between actions
+                    }
+                }
+            }
+            automationLoop();
         }
     }
 });
