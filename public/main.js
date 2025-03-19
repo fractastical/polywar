@@ -601,11 +601,45 @@ function render() {
 
     // Draw enemy polygons and fighters
     for (const enemy of enemies) {
-        // If it's a fighter (has a parentId), draw it with the parent's color
+        // If it's a fighter (has a parentId), draw it with special styling
         if (enemy.parentId) {
             const parent = findPolygonInGame(enemy.parentId);
             if (parent) {
-                drawPolygon(enemy, false, parent.ownerId === playerId, false);
+                // Draw with pulsing glow effect
+                ctx.save();
+                ctx.translate(enemy.x, enemy.y);
+                ctx.rotate(enemy.rotation || 0);
+
+                // Draw glow
+                ctx.beginPath();
+                ctx.arc(0, 0, enemy.size + 5, 0, Math.PI * 2);
+                ctx.fillStyle = `rgba(255, 255, 0, 0.2)`;
+                ctx.fill();
+
+                // Draw fighter polygon
+                ctx.beginPath();
+                for (let i = 0; i < enemy.sides; i++) {
+                    const angle = (i * 2 * Math.PI / enemy.sides);
+                    const x = enemy.size * Math.cos(angle);
+                    const y = enemy.size * Math.sin(angle);
+                    if (i === 0) ctx.moveTo(x, y);
+                    else ctx.lineTo(x, y);
+                }
+                ctx.closePath();
+                ctx.fillStyle = parent.color;
+                ctx.strokeStyle = '#FFD700';
+                ctx.lineWidth = 2;
+                ctx.fill();
+                ctx.stroke();
+
+                // Draw number
+                ctx.fillStyle = 'white';
+                ctx.font = '12px Arial';
+                ctx.textAlign = 'center';
+                ctx.textBaseline = 'middle';
+                ctx.fillText(enemy.sides.toString(), 0, 0);
+
+                ctx.restore();
             }
         } else {
             // Regular enemy
