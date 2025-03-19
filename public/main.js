@@ -6,6 +6,8 @@ let playerId = null;
 let gameId = null;
 let players = {}; // All players in the game
 let resources = 100;
+let playerName = "Player";
+let instructionsVisible = true;
 let enemies = [];
 let selectedPolygon = null;
 let currentMode = 3; // Start with triangle selected
@@ -19,6 +21,15 @@ const canvas = document.getElementById('gameCanvas');
 const ctx = canvas.getContext('2d');
 canvas.width = window.innerWidth;
 canvas.height = window.innerHeight;
+
+
+function setPlayerName() {
+    const input = document.getElementById('playerName');
+    if (input.value.trim() !== '') {
+        playerName = input.value.trim();
+        document.getElementById('nameInput').style.display = 'none';
+    }
+}
 
 // Polygon information
 const polygonInfo = {
@@ -244,6 +255,12 @@ window.addEventListener('keydown', (e) => {
     if (e.key === 'Escape') {
         currentMode = null;
         updateModeDisplay();
+    }
+
+    // 'I' key toggles instructions
+    if (e.key === 'i' || e.key === 'I') {
+        instructionsVisible = !instructionsVisible;
+        document.getElementById('info').style.display = instructionsVisible ? 'block' : 'none';
     }
 });
 
@@ -768,7 +785,7 @@ socket.on('gameEnd', (data) => {
     const scoresDiv = document.getElementById('scores');
 
     const currentScores = data.scores.map(score => 
-        `<div style="color: ${score.color}">Player: ${score.id === playerId ? 'YOU' : 'Player'} - Score: ${score.score}</div>`
+        `<div style="color: ${score.color}">${score.id === playerId ? playerName : 'Player'} - Score: ${score.score}</div>`
     ).join('');
 
     const history = data.history ? `
