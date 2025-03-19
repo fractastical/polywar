@@ -273,14 +273,18 @@ function checkCollisions(game) {
           if (polygon.sides === enemy.sides) {
             // Both polygons destroy each other
             game.enemies.splice(j, 1);
-            player.polygons.splice(i, 1);
+            
+            // Only remove player polygon if it's not a fighter (fighters are in enemies array)
+            if (!polygon.isFighter) {
+              player.polygons.splice(i, 1);
+              io.to(game.id).emit('polygonRemoved', {
+                polygonId: polygon.id,
+                playerId: playerId
+              });
+            }
 
             io.to(game.id).emit('enemyRemoved', {
               enemyId: enemy.id,
-              playerId: playerId
-            });
-            io.to(game.id).emit('polygonRemoved', {
-              polygonId: polygon.id,
               playerId: playerId
             });
             break;
