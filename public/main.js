@@ -230,6 +230,11 @@ window.addEventListener('keydown', (e) => {
                 polygonId: selectedPolygon.id,
                 gameId: gameId
             });
+            
+            // Add visual feedback
+            selectedPolygon.lastSpawnTime = Date.now();
+        } else {
+            console.log("Cannot spawn fighter - no combat polygon selected");
         }
     }
 
