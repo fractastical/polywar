@@ -59,6 +59,7 @@ socket.on('gameState', (gameState) => {
     console.log('Received game state:', gameState);
     players = gameState.players || {};
     enemies = gameState.enemies || [];
+    gameStartTime = gameState.startTime;
 
     // Update our local resources
     if (players[playerId]) {
@@ -66,7 +67,6 @@ socket.on('gameState', (gameState) => {
     }
 
     updateDisplay();
-    gameStartTime = Date.now();
     updateTimer();
 });
 

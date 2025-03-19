@@ -61,7 +61,10 @@ io.on('connection', (socket) => {
     socket.gameId = gameId;
 
     // Inform player about game state
-    socket.emit('gameState', games[gameId]);
+    socket.emit('gameState', {
+        ...games[gameId],
+        startTime: games[gameId].startTime
+    });
 
     // Inform other players about the new player
     socket.to(gameId).emit('playerJoined', players[socket.id]);
