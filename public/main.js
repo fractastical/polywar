@@ -637,7 +637,7 @@ function gameLoop() {
         }
     }
 
-    // Rotate enemies
+    // Rotate and move enemies and fighters
     for (const enemy of enemies) {
         enemy.rotation = (enemy.rotation || 0) + 0.01;
 
@@ -648,10 +648,16 @@ function gameLoop() {
             const distance = Math.sqrt(dx * dx + dy * dy);
 
             if (distance > 5) {
-                const info = polygonInfo[enemy.sides];
-                const speed = info ? info.speed * 0.5 : 0.75; // Slower than player
+                const baseSpeed = enemy.isFighter ? 2.0 : 0.75; // Fighters move faster
+                const speed = enemy.speed || baseSpeed;
                 enemy.x += (dx / distance) * speed;
                 enemy.y += (dy / distance) * speed;
+
+                // If it reaches target, set new random target for regular enemies
+                if (!enemy.isFighter && distance < 10) {
+                    enemy.targetX = Math.random() * canvas.width;
+                    enemy.targetY = Math.random() * canvas.height;
+                }
             }
         }
     }
