@@ -273,7 +273,7 @@ canvas.addEventListener('click', (e) => {
         const cost = polygonInfo[currentMode].cost;
         if (resources >= cost) {
             const info = polygonInfo[currentMode];
-            const placementMode = isProducerMode; // Determine placement mode
+            const isProducerMode = currentGameMode === 'producer';
 
             // Check if the placement location is within radius of own polygons and not overlapping
             let canPlace = false;
@@ -336,7 +336,7 @@ canvas.addEventListener('click', (e) => {
                     sides: currentMode,
                     size: info.size,
                     cost: cost,
-                    isProducer: isProducerMode // Use the mode toggle variable
+                    isProducer: currentGameMode === 'producer'
                 });
             }
         }
@@ -405,7 +405,7 @@ function updateModeDisplay() {
         document.getElementById('currentMode').textContent = currentGameMode.charAt(0).toUpperCase() + currentGameMode.slice(1);
     } else {
         const info = polygonInfo[currentMode];
-        const type = isProducerMode ? "Producer" : "Combat";
+        const type = currentGameMode.charAt(0).toUpperCase() + currentGameMode.slice(1);
         document.getElementById('currentMode').textContent = 
             `${info.name} - ${type} (Cost: ${info.cost})`;
     }
