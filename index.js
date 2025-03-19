@@ -504,22 +504,16 @@ function spawnFighter(game, polygon) {
     targetX: polygon.x + (Math.random() * 200 - 100),
     targetY: polygon.y + (Math.random() * 200 - 100),
     parentId: polygon.id,
-    speed: 1.0
+    speed: 1.0,
+    isFighter: true
   };
 
   // Add to game state
-  if (!game.enemies) game.enemies = [];
-  game.enemies.push(fighter);
-
-  // Log for debugging
-  console.log("Fighter spawned:", fighter);
+  if (!game.fighters) game.fighters = [];
+  game.fighters.push(fighter);
 
   // Broadcast spawn event to all players in the game
-  io.to(game.id).emit('fighterSpawned', {
-    fighter: fighter,
-    polygonId: polygon.id,
-    ownerId: polygon.ownerId
-  });
+  io.to(game.id).emit('fighterSpawned', fighter);
 }
 
 

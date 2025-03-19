@@ -164,14 +164,10 @@ socket.on('enemySpawned', (enemy) => {
     updateDisplay();
 });
 
-socket.on('fighterSpawned', (data) => {
-    console.log('Fighter spawned:', data);
-    const parentPolygon = findPolygonInGame(data.parentId);
-    if (parentPolygon) {
-        if (!parentPolygon.fighters) {
-            parentPolygon.fighters = [];
-        }
-        parentPolygon.fighters.push(data.fighter);
+socket.on('fighterSpawned', (fighter) => {
+    console.log('Fighter spawned:', fighter);
+    if (!enemies.some(e => e.id === fighter.id)) {
+        enemies.push(fighter);
     }
 });
 
