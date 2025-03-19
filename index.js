@@ -498,16 +498,30 @@ setInterval(() => {
 
       // Set timeout to restart game after 20 seconds
       setTimeout(() => {
-        // Reset game state
+        // Reset game state completely
         game.isFinished = false;
         game.startTime = Date.now();
         game.enemies = [];
+        // Reset each player to initial state
         for (const pid in game.players) {
-          game.players[pid].polygons = [];
+          const initialTriangle = {
+            id: Date.now() + Math.random(),
+            x: 500 + (Math.random() * 200 - 100), // Random position near center
+            y: 300 + (Math.random() * 200 - 100),
+            sides: 3,
+            size: 20,
+            color: game.players[pid].color, // Keep same color
+            ownerId: pid,
+            rotation: 0,
+            targetX: null,
+            targetY: null,
+            isProducer: true
+          };
+          game.players[pid].polygons = [initialTriangle];
           game.players[pid].resources = 100;
         }
         // Notify clients of game restart
-        io.to(gameId).emit('gameRestart');
+        io.to(gameId).emit('gameRestart', game);
       }, 20000);
     }
   }

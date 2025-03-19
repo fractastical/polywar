@@ -845,12 +845,14 @@ socket.on('gameEnd', (data) => {
     leaderboard.style.display = 'block';
 });
 
-socket.on('gameRestart', () => {
+socket.on('gameRestart', (game) => {
     isGameEnded = false;
     gameStartTime = Date.now();
     selectedPolygon = null;
     resources = 100;
     zoomLevel = 1.0; // Reset zoom level
+    players = game.players || {}; // Update with new game state
+    enemies = game.enemies || [];
     document.getElementById('leaderboard').style.display = 'none';
     updateTimer();
     updateDisplay();
