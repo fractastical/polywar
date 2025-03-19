@@ -76,23 +76,25 @@ io.on('connection', (socket) => {
 
     // Check if player has enough resources
     if (player.resources >= data.cost) {
-      // Create the polygon
-      const newPolygon = {
-        id: Date.now() + Math.random(),
-        x: data.x,
-        y: data.y,
-        sides: data.sides,
-        size: data.size,
-        color: player.color,
-        ownerId: socket.id,
-        rotation: 0,
-        targetX: null,
-        targetY: null,
-        isProducer: Boolean(data.isProducer), // Ensure boolean value
-        lastSpawnTime: Date.now(),
-        spawnInterval: 3000, // Spawn every 3 seconds
-        fighters: [] // Store spawned fighters
-      };
+        // Create the polygon
+        const newPolygon = {
+            id: Date.now() + Math.random(),
+            x: data.x,
+            y: data.y,
+            sides: data.sides,
+            size: data.size,
+            color: player.color,
+            ownerId: socket.id,
+            rotation: 0,
+            targetX: null,
+            targetY: null,
+            isProducer: data.isProducer, // Use direct value
+            lastSpawnTime: Date.now(),
+            spawnInterval: 3000, // Spawn every 3 seconds
+            fighters: [] // Store spawned fighters
+        };
+
+        console.log("Created new polygon:", newPolygon.id, "isProducer:", newPolygon.isProducer);
 
       // Add the polygon to the player's collection
       player.resources -= data.cost;
@@ -166,7 +168,7 @@ io.on('connection', (socket) => {
       console.log("Game not found");
       return;
     }
-    
+
     const player = game.players[socket.id];
     if (!player || !player.polygons) {
       console.log("Player or polygons not found");
@@ -272,7 +274,7 @@ function checkCollisions(game) {
             // Both polygons destroy each other if they have the same number of sides
             game.enemies.splice(j, 1);
             player.polygons.splice(i, 1);
-            
+
             io.to(game.id).emit('enemyRemoved', {
               enemyId: enemy.id,
               playerId: playerId
@@ -297,7 +299,7 @@ function checkCollisions(game) {
           else if (enemy.sides === polygon.sides + 1) {
             // Enemy wins if it has exactly one more side
             player.polygons.splice(i, 1);
-            
+
             io.to(game.id).emit('polygonRemoved', {
               polygonId: polygon.id,
               playerId: playerId
@@ -308,13 +310,13 @@ function checkCollisions(game) {
             // Bounce off each other
             const angle = Math.atan2(dy, dx);
             const overlap = (polygon.size + enemy.size) - distance;
-            
+
             // Move polygons apart
             polygon.x += Math.cos(angle) * overlap/2;
             polygon.y += Math.sin(angle) * overlap/2;
             enemy.x -= Math.cos(angle) * overlap/2;
             enemy.y -= Math.sin(angle) * overlap/2;
-            
+
             // Bounce velocities if they have momentum
             if (polygon.targetX !== null) {
               const tempX = polygon.targetX;
@@ -322,7 +324,7 @@ function checkCollisions(game) {
               polygon.targetX = polygon.x - (polygon.targetX - polygon.x);
               polygon.targetY = polygon.y - (polygon.targetY - polygon.y);
             }
-            
+
             if (enemy.targetX !== null) {
               enemy.targetX = enemy.x - (enemy.targetX - enemy.x);
               enemy.targetY = enemy.y - (enemy.targetY - enemy.y);
@@ -421,7 +423,7 @@ setInterval(() => {
               polygon.spawnInterval = 3000;
               polygon.fighters = [];
             }
-            
+
             // Check if enough time has passed to spawn
             const timeSinceLastSpawn = now - polygon.lastSpawnTime;
             if (timeSinceLastSpawn >= polygon.spawnInterval) {
@@ -436,7 +438,7 @@ setInterval(() => {
     // Check if game should end
     if (!game.isFinished && (now - game.startTime) >= GAME_DURATION) {
       game.isFinished = true;
-      
+
       // Calculate final scores
       const scores = Object.entries(game.players).map(([id, player]) => ({
         id,
@@ -458,7 +460,7 @@ setInterval(() => {
         scores,
         history: winnersHistory[gameId]
       });
-      
+
       // Set timeout to restart game after 20 seconds
       setTimeout(() => {
         // Reset game state
@@ -478,7 +480,7 @@ setInterval(() => {
 
 function spawnFighter(game, polygon) {
   if (!polygon || polygon.isProducer) return; // Don't spawn fighters from producers
-  
+
   console.log("Spawning fighter from polygon:", polygon.id);
 
   // Create the fighter with combat properties

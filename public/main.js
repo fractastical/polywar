@@ -197,6 +197,7 @@ window.addEventListener('keydown', (e) => {
     // T key toggles between producer and combat mode
     if (e.key === 't' || e.key === 'T') {
         isProducerMode = !isProducerMode;
+        console.log("Mode toggled:", isProducerMode ? "Producer" : "Combat");
         updateModeDisplay();
     }
 
