@@ -43,10 +43,10 @@
 </head>
 <body>
     <canvas id="gameCanvas"></canvas>
-    <div id="nameInput" style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); background: rgba(0,0,0,0.9); padding: 20px; border-radius: 10px; text-align: center;">
+    <div id="nameInput" style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); background: rgba(0,0,0,0.9); padding: 20px; border-radius: 10px; text-align: center; display: none;">
         <h3>Enter Your Name</h3>
         <input type="text" id="playerName" style="margin: 10px; padding: 5px;">
-        <button onclick="setPlayerName()" style="padding: 5px 10px;">Start</button>
+        <button onclick="setPlayerName()" style="padding: 5px 10px;">Set Name</button>
     </div>
     <div id="info">
         <h2>Polygon Warfare</h2>
@@ -58,6 +58,7 @@
         <div>Press <span class="key">R</span> to replicate selected polygon</div>
         <div>Press <span class="key">F</span> to spawn fighter from selected combat polygon</div>
         <div>Press <span class="key">I</span> to toggle instructions</div>
+        <div>Press <span class="key">N</span> to set your name</div>
     </div>
     <div id="status">
         <div>Time Left: <span id="timer">5:00</span></div>

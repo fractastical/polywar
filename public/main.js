@@ -262,6 +262,15 @@ window.addEventListener('keydown', (e) => {
         instructionsVisible = !instructionsVisible;
         document.getElementById('info').style.display = instructionsVisible ? 'block' : 'none';
     }
+
+    // 'N' key toggles name input
+    if (e.key === 'n' || e.key === 'N') {
+        const nameInput = document.getElementById('nameInput');
+        nameInput.style.display = nameInput.style.display === 'none' ? 'block' : 'none';
+        if (nameInput.style.display === 'block') {
+            document.getElementById('playerName').focus();
+        }
+    }
 });
 
 // Click to place, select, or move fighters
